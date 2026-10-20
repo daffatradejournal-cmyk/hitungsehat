@@ -20,7 +20,6 @@ const MIME_TYPES = {
 };
 
 const server = createServer(async (req, res) => {
-  // Simple CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -67,5 +66,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Hitung Sehat server berjalan di: http://localhost:${PORT}`);
+  console.log(`Hitung Sehat dev server: http://localhost:${PORT}`);
 });
