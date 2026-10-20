@@ -13,8 +13,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400;500&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles/app.css">
-  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="/styles/app.css">
+  <link rel="stylesheet" href="/styles/components.css">
 </head>
 <body>
   <div class="app-container">
@@ -23,7 +23,7 @@
     <header class="app-header">
       <a href="/" class="brand-block">
         <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
+          <svg width="22" height="22" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z" opacity="0.3"/>
             <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3C9.4 20.3 12 21 15 21c6 0 9-4 9-10 0-4-3-6-7-3zm-2 11c-2.4 0-4.6-.6-6.3-1.6 1.7-4 3.7-8.4 10.3-9.4 0 4.5-1.5 11-4 11z"/>
           </svg>
@@ -91,7 +91,7 @@
         <!-- Interactive Progress Ring -->
         <div class="daily-ring-container">
           <div class="ring-visual-wrap">
-            <svg class="ring-svg" viewBox="0 0 120 120">
+            <svg class="ring-svg" width="130" height="130" viewBox="0 0 120 120">
               <circle class="ring-circle-bg" cx="60" cy="60" r="54"></circle>
               <circle id="ring-progress-circle" class="ring-circle-val" cx="60" cy="60" r="54"></circle>
             </svg>
@@ -453,6 +453,6 @@
   </div>
 
   <!-- PWA Manifest & App Scripts -->
-  <script type="module" src="scripts/app.js"></script>
+  <script type="module" src="/scripts/app.js"></script>
 </body>
 </html>

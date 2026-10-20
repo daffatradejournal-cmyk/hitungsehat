@@ -4,7 +4,6 @@
   "description": "Aplikasi Web Penghitung & Pelacak Kalori Berbasis AI Vision",
   "type": "module",
   "scripts": {
-    "start": "node server.mjs",
     "dev": "node server.mjs",
     "lint": "node .agents/skills/design-taste-frontend/scripts/lint.mjs index.html styles scripts"
   },
