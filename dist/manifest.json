@@ -1,0 +1,16 @@
+{
+  "name": "Hitung Sehat — Pelacak Nutrisi & Kalori",
+  "short_name": "Hitung Sehat",
+  "description": "Pelacak kalori dan nutrisi pintar berbasis AI Vision",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafaf8",
+  "theme_color": "#194a3f",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

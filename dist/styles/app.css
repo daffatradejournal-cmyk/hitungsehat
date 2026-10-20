@@ -1,0 +1,334 @@
+/* Hitung Sehat — App Theme Stylesheet */
+/* Dealt Style: Editorial Greeting (Light) */
+/* Built strictly to the taste-skill v2 anti-slop guidelines */
+
+:root {
+  --ground: #fafaf8;
+  --surface: #ffffff;
+  --raised: #f3f4f1;
+  --active: #ebece8;
+  --border: #e4e6e1;
+  --rule: #eceee9;
+  --control: #d3d6cf;
+  --text: #191c1a;
+  --muted: #5e625c;
+  --faint: #787c76;
+  
+  --accent: #194a3f;
+  --primary: #194a3f;
+  --primary-ink: #ffffff;
+  
+  --positive: #226b42;
+  --negative: #b32a26;
+  --warning: #995010;
+  
+  --macro-carb: #b46a16;
+  --macro-protein: #194a3f;
+  --macro-fat: #7f3b54;
+
+  --pill-positive-bg: #dcfae5;
+  --pill-positive-ink: #04250e;
+  --pill-negative-bg: #fdecea;
+  --pill-negative-ink: #7a1d14;
+  --pill-warning-bg: #fffbeb;
+  --pill-warning-ink: #92400e;
+  --pill-neutral-bg: #f1f2ee;
+  --pill-neutral-ink: #3b3e39;
+
+  --chart-1: #194a3f;
+  --chart-2: #8aa89b;
+  --chart-3: #b46a16;
+  --chart-muted: #d0d4cd;
+
+  --radius-card: 20px;
+  --radius-inner: 14px;
+  --radius-control: 999px;
+  --radius-input: 12px;
+
+  --font: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+
+  --fs-title: 36px;
+  --fs-section: 18px;
+  --fs-kpi: 32px;
+  --fs-body: 15px;
+  --fs-small: 13px;
+
+  --pad: 24px;
+  --gap: 20px;
+  --control-height: 42px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-press: 120ms;
+  --t-hover: 150ms;
+  --t-ui: 200ms;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--ground);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tabular figures for numbers, weights, and calories */
+.tabular-num,
+.kpi-value,
+.metric-number,
+.calorie-badge,
+.gram-tag,
+.date-label {
+  font-variant-numeric: tabular-nums;
+}
+
+/* App Layout Container */
+.app-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 80px 20px;
+}
+
+/* App Header Shell */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: var(--accent);
+  color: var(--primary-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-mark svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.brand-name {
+  font-family: var(--font);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.brand-sub {
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Editorial Greeting Header */
+.greeting-section {
+  margin-bottom: 32px;
+}
+
+.greeting-headline {
+  font-family: var(--font-serif);
+  font-size: var(--fs-title);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 8px;
+  max-width: 800px;
+}
+
+.greeting-subline {
+  color: var(--muted);
+  font-size: var(--fs-body);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dot-separator {
+  color: var(--control);
+}
+
+/* Buttons and Controls */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--control-height);
+  padding: 0 18px;
+  border-radius: var(--radius-control);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--text);
+  transition: transform var(--t-press) var(--ease-out), background-color var(--t-hover) var(--ease-out), border-color var(--t-hover) var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--primary-ink);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #133930;
+  border-color: #133930;
+}
+
+.btn-secondary {
+  background-color: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  background-color: var(--raised);
+  border-color: var(--control);
+}
+
+.btn-pill {
+  height: 34px;
+  padding: 0 14px;
+  font-size: var(--fs-small);
+}
+
+.btn-danger {
+  background-color: #fff2f2;
+  border-color: #f5c2c2;
+  color: var(--negative);
+}
+
+.btn-danger:hover {
+  background-color: #ffe6e6;
+}
+
+.btn-icon-only {
+  width: var(--control-height);
+  height: var(--control-height);
+  padding: 0;
+  border-radius: var(--radius-control);
+}
+
+/* Status Pills */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+}
+
+.pill-positive {
+  background-color: var(--pill-positive-bg);
+  color: var(--pill-positive-ink);
+}
+
+.pill-warning {
+  background-color: var(--pill-warning-bg);
+  color: var(--pill-warning-ink);
+}
+
+.pill-negative {
+  background-color: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+}
+
+.pill-neutral {
+  background-color: var(--pill-neutral-bg);
+  color: var(--pill-neutral-ink);
+}
+
+.pill-transient {
+  background-color: #fbf5e6;
+  color: #7d440c;
+  border: 1px solid #eedec0;
+}
+
+.pill-accepted {
+  background-color: #eaf6ee;
+  color: #155724;
+  border: 1px solid #c9ebd3;
+}
+
+/* Responsive Grid Columns */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Panels and Cards */
+.panel {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--pad);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.panel-title {
+  font-size: var(--fs-section);
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.panel-meta {
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
