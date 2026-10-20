@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hitung Sehat — Pelacak Nutrisi & Kalori Berbasis AI Vision</title>
+  <meta name="description" content="Aplikasi web pelacak dan penghitung kalori cerdas berbasis AI Vision. Pindai foto makanan dan catat asupan nutrisi harian dengan mudah.">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#194a3f">
+
+  <!-- Google Fonts: Instrument Sans (UI) & Instrument Serif (Editorial Greeting) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles/app.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- App Header Shell -->
+    <header class="app-header">
+      <a href="/" class="brand-block">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z" opacity="0.3"/>
+            <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3C9.4 20.3 12 21 15 21c6 0 9-4 9-10 0-4-3-6-7-3zm-2 11c-2.4 0-4.6-.6-6.3-1.6 1.7-4 3.7-8.4 10.3-9.4 0 4.5-1.5 11-4 11z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">Hitung Sehat</div>
+          <div class="brand-sub">Pelacak Nutrisi AI Vision</div>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <button id="open-settings-btn" class="btn btn-secondary btn-pill" title="Buka Pengaturan Akun & Profil">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Profil</span>
+        </button>
+
+        <button id="open-scan-btn" class="btn btn-primary">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <span>Pindai Makanan</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Editorial Greeting Section -->
+    <section class="greeting-section">
+      <h1 id="greeting-headline" class="greeting-headline">Memuat ringkasan harian...</h1>
+      <div id="greeting-subline" class="greeting-subline"></div>
+    </section>
+
+    <!-- Top KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">Kalori Masuk (Tercatat)</div>
+        <div id="kpi-consumed" class="kpi-number tabular-num">0 kkal</div>
+        <div class="kpi-sub">Hanya hidangan yang telah di-accept</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sisa Kuota Kalori</div>
+        <div id="kpi-remaining" class="kpi-number tabular-num">0 kkal</div>
+        <div class="kpi-sub">Berdasarkan target harian</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Aktivitas Makan</div>
+        <div id="kpi-accepted-count" class="kpi-number tabular-num">0 hidangan</div>
+        <div class="kpi-sub">Tercatat di jurnal hari ini</div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <main class="dashboard-grid">
+      
+      <!-- Left Panel: Daily Progress & Macronutrients -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Ringkasan Nutrisi Hari Ini</h2>
+          <span class="status-pill pill-positive">Jurnal Aktif</span>
+        </div>
+
+        <!-- Interactive Progress Ring -->
+        <div class="daily-ring-container">
+          <div class="ring-visual-wrap">
+            <svg class="ring-svg" viewBox="0 0 120 120">
+              <circle class="ring-circle-bg" cx="60" cy="60" r="54"></circle>
+              <circle id="ring-progress-circle" class="ring-circle-val" cx="60" cy="60" r="54"></circle>
+            </svg>
+            <div class="ring-center-text">
+              <div id="ring-consumed-val" class="ring-center-val tabular-num">0</div>
+              <div class="ring-center-unit">kkal masuk</div>
+            </div>
+          </div>
+
+          <div class="ring-details">
+            <div class="ring-title">Keseimbangan Energi</div>
+            <div id="ring-remaining-desc" class="ring-caption">Memuat kuota kalori...</div>
+            <div class="ring-badge-line">
+              <span class="status-pill pill-neutral">Status: Terkendali</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Macronutrient Breakdown -->
+        <div class="macro-group">
+          <!-- Karbohidrat -->
+          <div class="macro-bar-item">
+            <div class="macro-bar-header">
+              <span class="macro-name">
+                <span class="macro-dot macro-dot-carb"></span>
+                <span>Karbohidrat</span>
+              </span>
+              <span id="macro-carb-stat" class="macro-stat tabular-num">0g / 0g</span>
+            </div>
+            <div class="macro-track">
+              <div id="macro-carb-fill" class="macro-fill macro-fill-carb" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Protein -->
+          <div class="macro-bar-item">
+            <div class="macro-bar-header">
+              <span class="macro-name">
+                <span class="macro-dot macro-dot-protein"></span>
+                <span>Protein</span>
+              </span>
+              <span id="macro-protein-stat" class="macro-stat tabular-num">0g / 0g</span>
+            </div>
+            <div class="macro-track">
+              <div id="macro-protein-fill" class="macro-fill macro-fill-protein" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Lemak -->
+          <div class="macro-bar-item">
+            <div class="macro-bar-header">
+              <span class="macro-name">
+                <span class="macro-dot macro-dot-fat"></span>
+                <span>Lemak</span>
+              </span>
+              <span id="macro-fat-stat" class="macro-stat tabular-num">0g / 0g</span>
+            </div>
+            <div class="macro-track">
+              <div id="macro-fat-fill" class="macro-fill macro-fill-fat" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Panel: Weekly 7-Day Time Series Trend -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Tren Kalori 7 Hari</h2>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-swatch swatch-accepted"></span>
+              <span>Tercatat</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch swatch-target"></span>
+              <span>Target</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="panel-meta" style="margin-bottom: 14px;">
+          Grafik hanya menghitung data yang telah dikonfirmasi (Accepted).
+        </p>
+
+        <div class="chart-card">
+          <div id="weekly-chart-bars" class="bars-chart-canvas">
+            <!-- Rendered reactively via app.js -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Today's Food Diary List -->
+    <section class="meal-list-section panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Daftar Makanan Hari Ini</h2>
+          <p class="panel-meta">Riwayat hidangan yang telah diverifikasi dan masuk perhitungan kalori.</p>
+        </div>
+      </div>
+
+      <div id="meal-empty-state" class="empty-state-card" style="display: none;">
+        <div class="empty-state-title">Belum ada makanan yang dicatat hari ini</div>
+        <p class="empty-state-desc">
+          Tekan tombol Pindai Makanan untuk mendeteksi hidangan dengan AI Vision dan mencatatnya ke jurnal harian.
+        </p>
+        <button onclick="document.getElementById('open-scan-btn').click()" class="btn btn-primary btn-pill">
+          Mulai Pindai Sekarang
+        </button>
+      </div>
+
+      <div id="meal-list-container" class="meal-items-container">
+        <!-- Rendered reactively via app.js -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ==================== SCANNER & DECISION GATE MODAL ==================== -->
+  <div id="scan-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="scan-modal-title">
+    <div class="modal-window">
+      <button id="close-scan-btn" class="modal-close-btn" title="Tutup Pemindai">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="panel-header">
+        <div>
+          <h2 id="scan-modal-title" class="panel-title">Pemindai Makanan AI Vision</h2>
+          <p class="panel-meta">Foto makanan Anda untuk menghitung porsi dan kalori secara otomatis.</p>
+        </div>
+      </div>
+
+      <!-- Live Camera Viewfinder -->
+      <div class="camera-viewfinder-box">
+        <video id="camera-video" class="camera-video-feed" playsinline muted autoplay></video>
+        <div class="camera-reticle"></div>
+      </div>
+
+      <!-- Camera Action Bar -->
+      <div class="camera-controls-bar">
+        <label for="file-upload-input" class="btn btn-secondary btn-pill" title="Unggah dari Galeri Foto">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <span>Unggah Foto</span>
+        </label>
+        <input type="file" id="file-upload-input" accept="image/jpeg,image/png,image/webp" style="display: none;">
+
+        <button id="btn-capture-photo" class="btn btn-primary" title="Ambil Foto Sekarang">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <span>Ambil Foto Makanan</span>
+        </button>
+      </div>
+
+      <!-- Sample Test Dishes Strip -->
+      <div style="margin-top: 14px;">
+        <span class="options-label">Atau coba simulasi hidangan:</span>
+        <div class="sample-photo-strip">
+          <button class="sample-thumb-btn" data-sample="nasi_padang">Nasi Padang Rendang</button>
+          <button class="sample-thumb-btn" data-sample="soto">Soto Ayam Lamongan</button>
+          <button class="sample-thumb-btn" data-sample="gado_gado">Gado-Gado Kacang</button>
+          <button class="sample-thumb-btn" data-sample="salmon">Salmon & Brokoli</button>
+          <button class="sample-thumb-btn" data-sample="blurry">Uji Foto Buram</button>
+          <button class="sample-thumb-btn" data-sample="non_food">Uji Benda Mati</button>
+        </div>
+      </div>
+
+      <!-- Skeleton Loading State during Vision Processing -->
+      <div id="scanner-skeleton" class="skeleton-container" style="display: none;">
+        <div class="skeleton-box" style="width: 60%; height: 26px;"></div>
+        <div class="skeleton-box" style="width: 90%;"></div>
+        <div class="skeleton-box" style="width: 40%; height: 32px;"></div>
+        <div class="skeleton-box" style="width: 100%; height: 70px;"></div>
+        <p class="panel-meta" style="text-align: center; margin-top: 8px;">
+          Mengompres dan menganalisis komponen hidangan dengan AI Vision...
+        </p>
+      </div>
+
+      <!-- Edge Case Alert: Non-Food Object -->
+      <div id="scanner-non-food-alert" class="edge-case-alert" style="display: none;">
+        <div class="edge-case-title">Objek Bukan Makanan</div>
+        <p id="non-food-message" class="edge-case-desc"></p>
+        <p class="panel-meta" style="margin-top: 8px;">
+          Tidak ada tombol konfirmasi untuk objek bukan makanan. Silakan arahkan kamera kembali ke hidangan konsumsi Anda.
+        </p>
+      </div>
+
+      <!-- ==================== THE PRD DECISION GATE ==================== -->
+      <div id="scanner-decision-gate" class="decision-gate-wrap" style="display: none;">
+        <div class="transient-alert-header">
+          <span class="status-pill pill-transient">Status: SCANNED_ONLY (Belum Masuk Jurnal)</span>
+          <span class="panel-meta">Pratinjau Eksploratif</span>
+        </div>
+        <p class="transient-notice-text">
+          Pemindaian bersifat eksploratif. Kalori ini <strong>tidak akan masuk</strong> ke grafik atau riwayat harian kecuali Anda menekan tombol <strong>Catat Makanan Ini</strong>.
+        </p>
+
+        <!-- Analysis Result Card -->
+        <div class="analysis-result-card">
+          <div class="result-food-name-row">
+            <span id="gate-food-name" class="result-food-name">Nama Hidangan</span>
+            <span id="gate-total-cals" class="result-calories-total tabular-num">0 kkal</span>
+          </div>
+
+          <div id="gate-weight-confidence" class="result-weight-confidence"></div>
+
+          <!-- Macros Pills -->
+          <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+            <span id="gate-macro-p" class="status-pill pill-neutral">Protein: 0g</span>
+            <span id="gate-macro-k" class="status-pill pill-neutral">Karbo: 0g</span>
+            <span id="gate-macro-l" class="status-pill pill-neutral">Lemak: 0g</span>
+          </div>
+
+          <!-- Components Breakdown -->
+          <div class="breakdown-title">Rincian Komponen Terdeteksi:</div>
+          <div id="gate-components-list" class="breakdown-list"></div>
+
+          <!-- Local Indonesian Culinary Broth/Oil Adjustment -->
+          <div class="culinary-options-group">
+            <div class="options-label">Pilihan Kuah & Santan (Kuliner Lokal):</div>
+            <div class="choice-pills-row">
+              <button type="button" class="choice-chip broth-chip" data-val="tiris">Sedikit Kuah / Tiris (-70 kkal)</button>
+              <button type="button" class="choice-chip broth-chip active" data-val="standar">Kuah Standar (0 kkal)</button>
+              <button type="button" class="choice-chip broth-chip" data-val="banyak">Banyak Santan / Minyak (+90 kkal)</button>
+            </div>
+          </div>
+
+          <!-- Portion Stepper -->
+          <div style="margin-top: 14px;">
+            <div class="options-label">Sesuaikan Porsi Konsumsi:</div>
+            <div class="portion-stepper-wrap">
+              <button id="btn-portion-minus" type="button" class="stepper-btn" title="Kurangi Porsi">-</button>
+              <span id="portion-val-display" class="stepper-display">1.0x porsi</span>
+              <button id="btn-portion-plus" type="button" class="stepper-btn" title="Tambah Porsi">+</button>
+            </div>
+          </div>
+
+          <!-- Meal Type Destination Selector -->
+          <div style="margin-top: 14px;">
+            <div class="options-label">Kategori Waktu Makan:</div>
+            <div class="choice-pills-row">
+              <button type="button" class="choice-chip meal-type-chip" data-val="Sarapan">Sarapan</button>
+              <button type="button" class="choice-chip meal-type-chip active" data-val="Makan Siang">Makan Siang</button>
+              <button type="button" class="choice-chip meal-type-chip" data-val="Makan Malam">Makan Malam</button>
+              <button type="button" class="choice-chip meal-type-chip" data-val="Camilan">Camilan</button>
+            </div>
+          </div>
+
+          <p id="gate-culinary-note" class="panel-meta" style="margin-top: 12px; font-style: italic;"></p>
+        </div>
+
+        <!-- THE DECISION GATE TWIN BUTTONS -->
+        <div class="decision-actions-row">
+          <button id="btn-gate-cancel" type="button" class="btn btn-secondary">
+            Abaikan / Batal
+          </button>
+          <button id="btn-gate-accept" type="button" class="btn btn-primary">
+            Catat Makanan Ini
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== PROFILE & AUTH MODAL ==================== -->
+  <div id="settings-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+    <div class="modal-window">
+      <button id="close-settings-btn" class="modal-close-btn" title="Tutup Pengaturan">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="panel-header">
+        <div>
+          <h2 id="settings-modal-title" class="panel-title">Profil Pengguna & Autentikasi</h2>
+          <p class="panel-meta">Kelola target kalori harian dan opsi login Anda.</p>
+        </div>
+      </div>
+
+      <!-- Multi-Channel Auth Simulation -->
+      <div style="margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border);">
+        <div class="options-label">Metode Autentikasi (Multi-Channel):</div>
+        <div class="choice-pills-row" style="margin-top: 8px;">
+          <button type="button" class="btn btn-secondary btn-pill auth-btn-option" data-channel="google">Google</button>
+          <button type="button" class="btn btn-secondary btn-pill auth-btn-option" data-channel="apple">Apple ID</button>
+          <button type="button" class="btn btn-secondary btn-pill auth-btn-option" data-channel="phone">WhatsApp / No HP (OTP)</button>
+        </div>
+      </div>
+
+      <form id="profile-settings-form">
+        <div class="form-group">
+          <label for="set-name" class="form-label">Nama Lengkap</label>
+          <input type="text" id="set-name" class="form-input" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="set-email" class="form-label">Email</label>
+            <input type="email" id="set-email" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="set-phone" class="form-label">Nomor WhatsApp / HP</label>
+            <input type="tel" id="set-phone" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="set-target" class="form-label">Target Kalori Harian (kkal)</label>
+          <input type="number" id="set-target" class="form-input" min="1000" max="6000" step="50" required>
+          <div class="form-help">Standar kebutuhan energi harian rata-rata dewasa adalah 2.000 kkal.</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+          <div class="form-group">
+            <label for="set-weight" class="form-label">Berat (kg)</label>
+            <input type="number" id="set-weight" class="form-input" min="30" max="250" step="0.5">
+          </div>
+          <div class="form-group">
+            <label for="set-height" class="form-label">Tinggi (cm)</label>
+            <input type="number" id="set-height" class="form-input" min="100" max="230">
+          </div>
+          <div class="form-group">
+            <label for="set-age" class="form-label">Usia (thn)</label>
+            <input type="number" id="set-age" class="form-input" min="12" max="100">
+          </div>
+        </div>
+
+        <!-- Google Gemini Vision API Key (Optional Override) -->
+        <div class="form-group" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule);">
+          <label for="set-gemini-key" class="form-label">Kunci API Google Gemini (Opsional)</label>
+          <input type="password" id="set-gemini-key" class="form-input" placeholder="AIzaSy...">
+          <div class="form-help">Jika diisi, foto akan diproses langsung oleh Gemini 2.5 Flash API. Jika kosong, sistem menggunakan engine cerdas bawaan.</div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button id="btn-reset-sample-data" type="button" class="btn btn-secondary">
+            Atur Ulang Data Sampel
+          </button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- PWA Manifest & App Scripts -->
+  <script type="module" src="scripts/app.js"></script>
+</body>
+</html>
