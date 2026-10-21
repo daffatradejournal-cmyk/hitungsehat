@@ -11,6 +11,7 @@ const DEFAULT_PROFILE = {
   email: 'budi.santoso@email.com',
   phone_number: '+6281234567890',
   auth_provider: 'google', // 'google' | 'apple' | 'phone' | 'email'
+  is_logged_in: false, // Default requires authentication gate
   daily_calorie_target: 2000,
   weight_kg: 68,
   height_cm: 172,
@@ -113,6 +114,55 @@ export class Store {
 
   saveProfile(updated) {
     this.profile = { ...this.profile, ...updated };
+    try {
+      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(this.profile));
+    } catch {}
+    this.notify();
+  }
+
+  isLoggedIn() {
+    return Boolean(this.profile && this.profile.is_logged_in);
+  }
+
+  login(provider = 'google', userData = {}) {
+    let name = userData.name;
+    let email = userData.email;
+    let phone = userData.phone || this.profile.phone_number || '+6281234567890';
+
+    if (provider === 'google') {
+      name = name || 'Budi Santoso';
+      email = email || 'budi.santoso@gmail.com';
+    } else if (provider === 'apple') {
+      name = name || 'Budi Santoso';
+      email = email || 'budi.santoso@privaterelay.appleid.com';
+    } else if (provider === 'phone') {
+      name = name || 'Pengguna ' + (phone.replace(/[^0-9]/g, '').slice(-4) || '8821');
+      email = email || `${phone.replace(/[^0-9]/g, '')}@sms.hitungsehat.id`;
+    } else if (provider === 'email') {
+      name = name || (email ? email.split('@')[0] : 'Pengguna Sehat');
+      email = email || 'pengguna@hitungsehat.id';
+    }
+
+    this.profile = {
+      ...this.profile,
+      name,
+      email,
+      phone_number: phone,
+      auth_provider: provider,
+      is_logged_in: true
+    };
+    try {
+      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(this.profile));
+    } catch {}
+    this.notify();
+    return this.profile;
+  }
+
+  logout() {
+    this.profile = {
+      ...this.profile,
+      is_logged_in: false
+    };
     try {
       localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(this.profile));
     } catch {}

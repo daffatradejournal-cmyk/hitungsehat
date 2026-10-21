@@ -560,29 +560,228 @@ resetDataBtn.addEventListener('click', () => {
   }
 });
 
-// Multi-Channel Auth Simulation Buttons
-document.querySelectorAll('.auth-btn-option').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const channel = btn.getAttribute('data-channel');
-    if (channel === 'google') {
-      store.saveProfile({ auth_provider: 'google', email: 'budi.santoso@gmail.com' });
-      showToast('Masuk dengan akun Google.');
-    } else if (channel === 'apple') {
-      store.saveProfile({ auth_provider: 'apple', email: 'budi.santoso@icloud.com' });
-      showToast('Masuk dengan Apple ID.');
-    } else if (channel === 'phone') {
-      const otp = prompt('Masukkan 4 digit kode OTP yang dikirim via WhatsApp (simulasi):', '8821');
-      if (otp) {
-        store.saveProfile({ auth_provider: 'phone', phone_number: '+6281234567890' });
-        showToast('Login WhatsApp/OTP berhasil diverifikasi.');
+// 7. AUTHENTICATION GATE & VIEW CONTROLLER
+const authGateScreen = document.getElementById('auth-gate-screen');
+const mainAppScreen = document.getElementById('main-app-screen');
+
+const btnAuthGoogle = document.getElementById('btn-auth-google');
+const btnAuthApple = document.getElementById('btn-auth-apple');
+
+const tabAuthPhone = document.getElementById('tab-auth-phone');
+const tabAuthEmail = document.getElementById('tab-auth-email');
+const authPhoneGroup = document.getElementById('auth-phone-field-group');
+const authEmailGroup = document.getElementById('auth-email-field-group');
+const authPhoneInput = document.getElementById('auth-phone-input');
+const authEmailInput = document.getElementById('auth-email-input');
+
+const authInputView = document.getElementById('auth-input-view');
+const authOtpView = document.getElementById('auth-otp-view');
+const authCredForm = document.getElementById('auth-credential-form');
+const btnVerifyOtp = document.getElementById('btn-verify-otp');
+const btnAuthBack = document.getElementById('btn-auth-back');
+const otpSentDesc = document.getElementById('otp-sent-description');
+const otpInputs = document.querySelectorAll('.otp-digit-box');
+
+const btnAppLogout = document.getElementById('btn-app-logout');
+const headerUserAvatar = document.getElementById('header-user-avatar');
+const headerUserName = document.getElementById('header-user-name');
+const modalUserAvatar = document.getElementById('modal-user-avatar');
+const modalUserName = document.getElementById('modal-user-name');
+const modalUserChannel = document.getElementById('modal-user-channel');
+
+let activeAuthTab = 'phone'; // 'phone' | 'email'
+
+function renderAuthState() {
+  const isLoggedIn = store.isLoggedIn();
+  const profile = store.profile;
+
+  if (!isLoggedIn) {
+    if (authGateScreen) authGateScreen.classList.remove('hidden');
+    if (mainAppScreen) mainAppScreen.classList.add('hidden');
+    if (authInputView) authInputView.classList.remove('hidden');
+    if (authOtpView) authOtpView.classList.add('hidden');
+  } else {
+    if (authGateScreen) authGateScreen.classList.add('hidden');
+    if (mainAppScreen) mainAppScreen.classList.remove('hidden');
+
+    // Update Header Avatar & Name
+    const initial = (profile.name || 'P').charAt(0).toUpperCase();
+    if (headerUserAvatar) headerUserAvatar.textContent = initial;
+    if (headerUserName) headerUserName.textContent = profile.name || 'Pengguna';
+
+    // Update Profile Modal Account Card
+    if (modalUserAvatar) modalUserAvatar.textContent = initial;
+    if (modalUserName) modalUserName.textContent = profile.name || 'Pengguna';
+    
+    let providerLabel = 'Google';
+    if (profile.auth_provider === 'apple') {
+      providerLabel = `Apple ID (${profile.email || 'Akun Apple'})`;
+    } else if (profile.auth_provider === 'phone') {
+      providerLabel = `WhatsApp (${profile.phone_number || '+62'})`;
+    } else if (profile.auth_provider === 'email') {
+      providerLabel = `Email (${profile.email || ''})`;
+    } else if (profile.auth_provider === 'google') {
+      providerLabel = `Google (${profile.email || ''})`;
+    }
+
+    if (modalUserChannel) modalUserChannel.textContent = `Terhubung via ${providerLabel}`;
+  }
+}
+
+// Social OAuth Buttons
+if (btnAuthGoogle) {
+  btnAuthGoogle.addEventListener('click', () => {
+    store.login('google', {
+      name: 'Budi Santoso',
+      email: 'budi.santoso@gmail.com'
+    });
+    renderAuthState();
+    showToast('Berhasil masuk dengan akun Google.');
+  });
+}
+
+if (btnAuthApple) {
+  btnAuthApple.addEventListener('click', () => {
+    store.login('apple', {
+      name: 'Budi Santoso',
+      email: 'budi.santoso@privaterelay.appleid.com'
+    });
+    renderAuthState();
+    showToast('Berhasil masuk dengan ID Apple.');
+  });
+}
+
+// Channel Tab Switching
+if (tabAuthPhone) {
+  tabAuthPhone.addEventListener('click', () => {
+    activeAuthTab = 'phone';
+    tabAuthPhone.classList.add('active');
+    tabAuthPhone.setAttribute('aria-selected', 'true');
+    if (tabAuthEmail) {
+      tabAuthEmail.classList.remove('active');
+      tabAuthEmail.setAttribute('aria-selected', 'false');
+    }
+    if (authPhoneGroup) authPhoneGroup.classList.remove('hidden');
+    if (authEmailGroup) authEmailGroup.classList.add('hidden');
+    if (authPhoneInput) authPhoneInput.focus();
+  });
+}
+
+if (tabAuthEmail) {
+  tabAuthEmail.addEventListener('click', () => {
+    activeAuthTab = 'email';
+    tabAuthEmail.classList.add('active');
+    tabAuthEmail.setAttribute('aria-selected', 'true');
+    if (tabAuthPhone) {
+      tabAuthPhone.classList.remove('active');
+      tabAuthPhone.setAttribute('aria-selected', 'false');
+    }
+    if (authEmailGroup) authEmailGroup.classList.remove('hidden');
+    if (authPhoneGroup) authPhoneGroup.classList.add('hidden');
+    if (authEmailInput) authEmailInput.focus();
+  });
+}
+
+// Request OTP Code Form
+if (authCredForm) {
+  authCredForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (activeAuthTab === 'phone') {
+      const num = authPhoneInput ? authPhoneInput.value.trim() : '81234567890';
+      if (otpSentDesc) {
+        otpSentDesc.textContent = `Masukkan 4 digit kode yang kami kirimkan ke +62 ${num}:`;
+      }
+    } else {
+      const email = authEmailInput ? authEmailInput.value.trim() : 'pengguna@hitungsehat.id';
+      if (otpSentDesc) {
+        otpSentDesc.textContent = `Masukkan 4 digit kode yang kami kirimkan ke ${email}:`;
       }
     }
-    loadProfileToForm();
+    if (authInputView) authInputView.classList.add('hidden');
+    if (authOtpView) authOtpView.classList.remove('hidden');
+    
+    // Auto populate realistic simulation code: 8 8 2 1
+    const defaultCode = ['8', '8', '2', '1'];
+    otpInputs.forEach((inp, idx) => {
+      inp.value = defaultCode[idx] || '';
+    });
+    if (otpInputs[0]) otpInputs[0].focus();
+    showToast('Kode OTP verifikasi telah dikirim (simulasi: 8821).');
+  });
+}
+
+// OTP Input Navigation (Arrow, Backspace, Auto-advance)
+otpInputs.forEach((input, index) => {
+  input.addEventListener('input', (e) => {
+    const val = e.target.value.replace(/[^0-9]/g, '');
+    e.target.value = val.slice(-1);
+    if (val && index < otpInputs.length - 1) {
+      otpInputs[index + 1].focus();
+    }
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !input.value && index > 0) {
+      otpInputs[index - 1].focus();
+    } else if (e.key === 'Enter') {
+      if (btnVerifyOtp) btnVerifyOtp.click();
+    }
+  });
+
+  input.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+    paste.split('').slice(0, 4).forEach((ch, i) => {
+      if (otpInputs[i]) otpInputs[i].value = ch;
+    });
+    if (otpInputs[Math.min(paste.length, 3)]) {
+      otpInputs[Math.min(paste.length, 3)].focus();
+    }
   });
 });
 
+// Verify OTP & Login
+if (btnVerifyOtp) {
+  btnVerifyOtp.addEventListener('click', () => {
+    let code = '';
+    otpInputs.forEach(i => { code += i.value; });
+    if (code.length < 4) {
+      showToast('Silakan masukkan 4 digit kode verifikasi.');
+      return;
+    }
+    if (activeAuthTab === 'phone') {
+      const num = authPhoneInput ? authPhoneInput.value.trim() : '81234567890';
+      store.login('phone', { phone: `+62${num}` });
+    } else {
+      const email = authEmailInput ? authEmailInput.value.trim() : 'pengguna@hitungsehat.id';
+      store.login('email', { email });
+    }
+    renderAuthState();
+    showToast('Verifikasi berhasil! Selamat datang di Hitung Sehat.');
+  });
+}
+
+// Back to Input View
+if (btnAuthBack) {
+  btnAuthBack.addEventListener('click', () => {
+    if (authOtpView) authOtpView.classList.add('hidden');
+    if (authInputView) authInputView.classList.remove('hidden');
+  });
+}
+
+// Logout Action
+if (btnAppLogout) {
+  btnAppLogout.addEventListener('click', () => {
+    if (settingsModal) settingsModal.classList.remove('active');
+    store.logout();
+    renderAuthState();
+    showToast('Anda telah keluar dari akun.');
+  });
+}
+
 // Reactively re-render views on store changes
 store.subscribe(() => {
+  renderAuthState();
   renderGreeting();
   renderDailyProgress();
   renderWeeklyChart();
@@ -590,6 +789,7 @@ store.subscribe(() => {
 });
 
 // Initial boot
+renderAuthState();
 renderGreeting();
 renderDailyProgress();
 renderWeeklyChart();

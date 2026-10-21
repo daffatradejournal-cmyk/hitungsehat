@@ -332,3 +332,7 @@ html, body {
   font-size: var(--fs-small);
   color: var(--muted);
 }
+
+.hidden {
+  display: none !important;
+}
