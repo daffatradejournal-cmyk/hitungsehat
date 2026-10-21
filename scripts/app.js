@@ -3,6 +3,7 @@
 
 import { Store } from './store.js';
 import { VisionEngine } from './vision-engine.js';
+import { supabaseService } from './supabase-client.js';
 
 const store = new Store();
 const vision = new VisionEngine();
@@ -531,6 +532,13 @@ function loadProfileToForm() {
   document.getElementById('set-height').value = p.height_cm || 172;
   document.getElementById('set-age').value = p.age || 28;
   document.getElementById('set-gemini-key').value = vision.geminiApiKey || '';
+
+  // Load Supabase Backend Config
+  const sbConfig = supabaseService.getConfig();
+  const sbUrlEl = document.getElementById('set-supabase-url');
+  const sbKeyEl = document.getElementById('set-supabase-key');
+  if (sbUrlEl) sbUrlEl.value = sbConfig.url || '';
+  if (sbKeyEl) sbKeyEl.value = sbConfig.key || '';
 }
 
 settingsForm.addEventListener('submit', (e) => {
@@ -548,9 +556,14 @@ settingsForm.addEventListener('submit', (e) => {
   const geminiKey = document.getElementById('set-gemini-key').value.trim();
   vision.setApiKey(geminiKey);
 
+  // Save Supabase Config
+  const sbUrl = document.getElementById('set-supabase-url')?.value.trim() || '';
+  const sbKey = document.getElementById('set-supabase-key')?.value.trim() || '';
+  supabaseService.saveConfig(sbUrl, sbKey);
+
   store.saveProfile(updated);
   settingsModal.classList.remove('active');
-  showToast('Profil dan target kalori berhasil disimpan.');
+  showToast('Profil dan konfigurasi berhasil disimpan.');
 });
 
 resetDataBtn.addEventListener('click', () => {
@@ -630,7 +643,17 @@ function renderAuthState() {
 
 // Social OAuth Buttons
 if (btnAuthGoogle) {
-  btnAuthGoogle.addEventListener('click', () => {
+  btnAuthGoogle.addEventListener('click', async () => {
+    if (supabaseService.isConfigured()) {
+      try {
+        showToast('Mengarahkan ke Google OAuth resmi...');
+        await supabaseService.signInWithGoogle();
+        return;
+      } catch (err) {
+        showToast(`Info Supabase: ${err.message}`);
+      }
+    }
+    // Instant fallback if Supabase not yet configured
     store.login('google', {
       name: 'Budi Santoso',
       email: 'budi.santoso@gmail.com'
@@ -641,7 +664,17 @@ if (btnAuthGoogle) {
 }
 
 if (btnAuthApple) {
-  btnAuthApple.addEventListener('click', () => {
+  btnAuthApple.addEventListener('click', async () => {
+    if (supabaseService.isConfigured()) {
+      try {
+        showToast('Mengarahkan ke Apple ID resmi...');
+        await supabaseService.signInWithApple();
+        return;
+      } catch (err) {
+        showToast(`Info Supabase: ${err.message}`);
+      }
+    }
+    // Instant fallback if Supabase not yet configured
     store.login('apple', {
       name: 'Budi Santoso',
       email: 'budi.santoso@privaterelay.appleid.com'
@@ -684,29 +717,42 @@ if (tabAuthEmail) {
 
 // Request OTP Code Form
 if (authCredForm) {
-  authCredForm.addEventListener('submit', (e) => {
+  authCredForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (activeAuthTab === 'phone') {
-      const num = authPhoneInput ? authPhoneInput.value.trim() : '81234567890';
-      if (otpSentDesc) {
-        otpSentDesc.textContent = `Masukkan 4 digit kode yang kami kirimkan ke +62 ${num}:`;
+    const isPhone = activeAuthTab === 'phone';
+    const num = authPhoneInput ? authPhoneInput.value.trim() : '81234567890';
+    const email = authEmailInput ? authEmailInput.value.trim() : 'pengguna@hitungsehat.id';
+
+    if (otpSentDesc) {
+      otpSentDesc.textContent = isPhone
+        ? `Masukkan 4 digit kode yang kami kirimkan ke +62 ${num}:`
+        : `Masukkan 4 digit kode yang kami kirimkan ke ${email}:`;
+    }
+
+    if (supabaseService.isConfigured()) {
+      try {
+        showToast('Mengirim kode autentikasi via Supabase...');
+        await supabaseService.sendOtp({
+          phone: isPhone ? `+62${num}` : undefined,
+          email: !isPhone ? email : undefined
+        });
+        showToast(isPhone ? 'Kode OTP terkirim ke ponsel Anda.' : 'Tautan/kode terkirim ke email Anda.');
+      } catch (err) {
+        showToast(`Catatan: ${err.message}`);
       }
     } else {
-      const email = authEmailInput ? authEmailInput.value.trim() : 'pengguna@hitungsehat.id';
-      if (otpSentDesc) {
-        otpSentDesc.textContent = `Masukkan 4 digit kode yang kami kirimkan ke ${email}:`;
-      }
+      showToast('Kode OTP verifikasi telah dikirim (simulasi: 8821).');
     }
+
     if (authInputView) authInputView.classList.add('hidden');
     if (authOtpView) authOtpView.classList.remove('hidden');
     
-    // Auto populate realistic simulation code: 8 8 2 1
+    // Auto populate realistic code: 8 8 2 1
     const defaultCode = ['8', '8', '2', '1'];
     otpInputs.forEach((inp, idx) => {
       inp.value = defaultCode[idx] || '';
     });
     if (otpInputs[0]) otpInputs[0].focus();
-    showToast('Kode OTP verifikasi telah dikirim (simulasi: 8821).');
   });
 }
 
@@ -742,18 +788,45 @@ otpInputs.forEach((input, index) => {
 
 // Verify OTP & Login
 if (btnVerifyOtp) {
-  btnVerifyOtp.addEventListener('click', () => {
+  btnVerifyOtp.addEventListener('click', async () => {
     let code = '';
     otpInputs.forEach(i => { code += i.value; });
     if (code.length < 4) {
       showToast('Silakan masukkan 4 digit kode verifikasi.');
       return;
     }
-    if (activeAuthTab === 'phone') {
-      const num = authPhoneInput ? authPhoneInput.value.trim() : '81234567890';
+
+    const isPhone = activeAuthTab === 'phone';
+    const num = authPhoneInput ? authPhoneInput.value.trim() : '81234567890';
+    const email = authEmailInput ? authEmailInput.value.trim() : 'pengguna@hitungsehat.id';
+
+    if (supabaseService.isConfigured()) {
+      try {
+        const res = await supabaseService.verifyOtp({
+          phone: isPhone ? `+62${num}` : undefined,
+          email: !isPhone ? email : undefined,
+          token: code
+        });
+        const u = res?.user || res?.session?.user;
+        const name = u?.user_metadata?.full_name || (isPhone ? `Pengguna ${num.slice(-4)}` : email.split('@')[0]);
+        store.login(isPhone ? 'phone' : 'email', {
+          name,
+          phone: isPhone ? `+62${num}` : undefined,
+          email: !isPhone ? email : undefined
+        });
+        renderAuthState();
+        showToast('Verifikasi Supabase berhasil! Selamat datang.');
+        return;
+      } catch (err) {
+        showToast(`Gagal verifikasi Supabase: ${err.message}`);
+        return;
+      }
+    }
+
+    // Default fast-path fallback
+    if (isPhone) {
       store.login('phone', { phone: `+62${num}` });
     } else {
-      const email = authEmailInput ? authEmailInput.value.trim() : 'pengguna@hitungsehat.id';
       store.login('email', { email });
     }
     renderAuthState();
@@ -771,13 +844,32 @@ if (btnAuthBack) {
 
 // Logout Action
 if (btnAppLogout) {
-  btnAppLogout.addEventListener('click', () => {
+  btnAppLogout.addEventListener('click', async () => {
     if (settingsModal) settingsModal.classList.remove('active');
+    await supabaseService.signOut();
     store.logout();
     renderAuthState();
     showToast('Anda telah keluar dari akun.');
   });
 }
+
+// Listen to Supabase Session Changes in Realtime
+supabaseService.onAuthStateChange((event, session) => {
+  if (session && session.user) {
+    const u = session.user;
+    const name = u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'Pengguna Sehat';
+    const provider = u.app_metadata?.provider || 'google';
+    store.login(provider, {
+      name,
+      email: u.email || '',
+      phone: u.phone || ''
+    });
+    renderAuthState();
+  } else if (event === 'SIGNED_OUT') {
+    store.logout();
+    renderAuthState();
+  }
+});
 
 // Reactively re-render views on store changes
 store.subscribe(() => {

@@ -549,6 +549,20 @@
           <div class="form-help">Jika diisi, foto akan diproses langsung oleh Gemini 2.5 Flash API. Jika kosong, sistem menggunakan engine cerdas bawaan.</div>
         </div>
 
+        <!-- Supabase Cloud Backend Integration (Production Auth) -->
+        <div class="form-group" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule);">
+          <div class="options-label" style="margin-bottom: 8px;">Koneksi Backend Supabase (Autentikasi Asli)</div>
+          <div class="form-group" style="margin-bottom: 8px;">
+            <label for="set-supabase-url" class="form-label">Supabase Project URL</label>
+            <input type="url" id="set-supabase-url" class="form-input" placeholder="https://xyz.supabase.co">
+          </div>
+          <div class="form-group" style="margin-bottom: 4px;">
+            <label for="set-supabase-key" class="form-label">Supabase Anon Public Key</label>
+            <input type="password" id="set-supabase-key" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+          </div>
+          <div class="form-help">Jika diisi atau disetel via Vercel env, tombol login Google, Apple & OTP akan terhubung langsung ke server Supabase asli.</div>
+        </div>
+
         <div style="display: flex; gap: 12px; margin-top: 24px;">
           <button id="btn-reset-sample-data" type="button" class="btn btn-secondary">
             Atur Ulang Data Sampel
