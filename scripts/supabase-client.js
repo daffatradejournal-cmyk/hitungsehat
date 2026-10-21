@@ -5,7 +5,7 @@ const STORAGE_KEY_SUPABASE_URL = 'hitung_sehat_supabase_url';
 const STORAGE_KEY_SUPABASE_KEY = 'hitung_sehat_supabase_key';
 
 // Project credentials configured for daffatradejournal-cmyk's Project
-const DEFAULT_SUPABASE_URL = 'https://rtsxzcqyqqrrqkcxawe.supabase.co';
+const DEFAULT_SUPABASE_URL = 'https://rtxsxzcgyqqrrqkcxawe.supabase.co';
 const DEFAULT_SUPABASE_KEY = 'sb_publishable_hvvVkvp01hUvgpvRVSR1Vg_OK7CrfEC';
 
 class SupabaseService {
