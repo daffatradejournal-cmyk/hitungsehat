@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "Aplikasi Web Penghitung & Pelacak Kalori Berbasis AI Vision",
   "type": "module",
+  "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "start": "node index.js",
     "lint": "node .agents/skills/design-taste-frontend/scripts/lint.mjs index.html styles scripts"
   },
   "devDependencies": {
